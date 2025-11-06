@@ -1,6 +1,8 @@
+/* eslint-disable max-len */
+
 'use server';
 
-import { Stuff, Condition } from '@prisma/client';
+import { Stuff, Condition, Contact } from '@prisma/client';
 import { hash } from 'bcrypt';
 import { redirect } from 'next/navigation';
 import { prisma } from './prisma';
@@ -91,4 +93,44 @@ export async function changePassword(credentials: { email: string; password: str
       password,
     },
   });
+}
+
+/**
+ * Adds a new Contact to the database.
+ * @param contact, an object with the following properties: id, owner, firstName, lastName, address, image, description
+ */
+export async function addContact(contact: Contact) {
+  await prisma.contact.create({
+    data: {
+      firstName: contact.firstName,
+      lastName: contact.lastName,
+      address: contact.address,
+      image: contact.image,
+      description: contact.description,
+      owner: contact.owner,
+    },
+  });
+  // After adding, redirect to the list page
+  redirect('/list');
+}
+
+/**
+ * Edits an existing Contact in the database.
+ * @param contact, an object with the following properties: id, owner, firstName, lastName, address, image, description
+ */
+export async function editContact(contact: Contact) {
+  // console.log(`editStuff data: ${JSON.stringify(stuff, null, 2)}`);
+  await prisma.contact.update({
+    where: { id: contact.id },
+    data: {
+      firstName: contact.firstName,
+      lastName: contact.lastName,
+      address: contact.address,
+      image: contact.image,
+      description: contact.description,
+      owner: contact.owner,
+    },
+  });
+  // After updating, redirect to the list page
+  redirect('/list');
 }
