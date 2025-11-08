@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma';
 // import StuffItem from '@/components/StuffItem';
 import { loggedInProtectedPage } from '@/lib/page-protection';
 import authOptions from '@/lib/authOptions';
-import { Contact } from '@/lib/validationSchemas';
+import { Contact, Note } from '@prisma/client';
 import ContactCard from '@/components/ContactCard';
 
 /** Render a list of stuff for the logged in user. */
@@ -23,6 +23,12 @@ const ListPage = async () => {
       owner,
     },
   });
+
+  const notes: Note[] = await prisma.note.findMany({
+    where: {
+      owner,
+    },
+  });
   console.log(contacts);
   return (
     <main>
@@ -30,10 +36,10 @@ const ListPage = async () => {
         <Row>
           <Col>
             <h1 className="text-center">List Contacts</h1>
-            <Row xs={1} md={2} lg={3} className="g-4 text-center">
+            <Row xs={1} md={2} lg={3} className="g-4">
               {contacts.map((contact) => (
                 <Col key={contact.firstName + contact.lastName}>
-                  <ContactCard contact={contact} />
+                  <ContactCard contact={contact} notes={notes.filter(note => (note.contactId === contact.id))} />
                 </Col>
               ))}
             </Row>
